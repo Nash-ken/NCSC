@@ -3,7 +3,6 @@ import 'server-only'
 import { cookies } from 'next/headers'
 import { decrypt } from '@/lib/session'
 import { cache } from 'react'
-import { client } from './api'
  
 export const verifySession = cache(async () => {
   const cookie = (await cookies()).get('session')?.value
@@ -23,12 +22,11 @@ export const getUser = cache(async () => {
     
     const decoded = await decrypt(`${session.userId}`) as { id: number; iat: number, exp: number}
     if(!decoded) return null
-    const strapi = client.collection('/users');
-    const users = await strapi.findOne(decoded.id.toString())
+   
 
-    if(!users) return null
+   
 
-    return users as unknown as User;
+    return decoded.id
   
   })
 

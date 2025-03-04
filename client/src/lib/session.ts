@@ -1,7 +1,7 @@
 import 'server-only'
 import { SignJWT, jwtVerify, JWTPayload } from 'jose'
 import { cookies } from 'next/headers'
-import { client } from './api'
+import { strapi } from './api'
  
 const secretKey = process.env.JWT_SECRET
 const encodedKey = new TextEncoder().encode(secretKey)
@@ -71,18 +71,24 @@ export async function deleteSession() {
 
 
 
-export const authenticate = async (): Promise<AuthResponse> => {
+export const authenticate = async (email: string, password: string): Promise<AuthResponse> => {
     try {
-        const result = await client.fetch('/auth/local', {
+        const response = await fetch(`${strapi.baseURL}/auth/local`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({identifier: "test", password: "testing"})
+            body: JSON.stringify({identifier: email, password: password})
         })
 
-        const data = await result.json();
-        return data;
+        const result = await response.json()
+
+        if(response.status !== 200 || result.error) {
+          return { error: result?.error.message }
+        }
+
+        return result;
+
     } catch (error) {
-        return { error: "Credentials Invalid"}
+        return { error: error instanceof Error ? error.message : "Unknown error occurred" };
     }
 }
 
