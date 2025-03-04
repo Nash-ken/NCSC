@@ -10,7 +10,7 @@ export const verifySession = cache(async () => {
   const session = await decrypt(cookie)
  
   if (!session?.userId) {
-    return { isAuth: false, userId: null }
+    return { isAuth: false, userId: '' }
   }
  
   return { isAuth: true, userId: session.userId }
