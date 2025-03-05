@@ -3,6 +3,7 @@ import 'server-only'
 import { cookies } from 'next/headers'
 import { decrypt } from '@/lib/session'
 import { cache } from 'react'
+import { strapi } from './api'
  
 export const verifySession = cache(async () => {
   const cookie = (await cookies()).get('session')?.value
@@ -22,12 +23,21 @@ export const getUser = cache(async () => {
     
     const decoded = await decrypt(`${session.userId}`) as { id: number; iat: number, exp: number}
     if(!decoded) return null
-   
 
-   
+    try {
+      const response = await fetch(`${strapi.baseURL}/users/${decoded.id}`, {
+        headers: { Authorization: `Bearer ${strapi.auth}` }
+      });
+      
+      if(!response.ok) return null
 
-    return decoded.id
-  
+      const data = await response.json()
+
+      return data as User;
+
+    } catch (error) {
+      
+    }
   })
 
 

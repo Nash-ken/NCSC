@@ -1,103 +1,121 @@
-import 'server-only'
-import { SignJWT, jwtVerify, JWTPayload } from 'jose'
-import { cookies } from 'next/headers'
-import { strapi } from './api'
- 
-const secretKey = process.env.JWT_SECRET
-const encodedKey = new TextEncoder().encode(secretKey)
- 
-export async function encrypt(payload: JWTPayload) {
-  return new SignJWT(payload)
-    .setProtectedHeader({ alg: 'HS256' })
-    .setIssuedAt()
-    .setExpirationTime('7d')
-    .sign(encodedKey)
+import 'server-only';
+import { SignJWT, jwtVerify, JWTPayload } from 'jose';
+import { cookies, headers } from 'next/headers';
+import { strapi } from './api';
+
+const secretKey = process.env.JWT_SECRET;
+const encodedKey = new TextEncoder().encode(secretKey);
+
+// Helper function to determine if the request is secure (HTTPS)
+async function isSecureRequest() {
+  const proto = (await headers()).get('x-forwarded-proto');
+  return proto === 'https';
 }
- 
-export async function decrypt(session: string | undefined = '') {
+
+// Helper function to generate the expiration date (7 days from now)
+function getExpirationDate() {
+  return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+}
+
+// Function to encrypt a payload and return a signed JWT token
+export async function encrypt(payload: JWTPayload): Promise<string | null> {
   try {
-    const { payload } = await jwtVerify(session, encodedKey, {
-      algorithms: ['HS256'],
-    })
-    return payload
+    return await new SignJWT(payload)
+      .setProtectedHeader({ alg: 'HS256' })
+      .setIssuedAt()
+      .setExpirationTime('7d')
+      .sign(encodedKey);
   } catch (error) {
-    console.log('Failed to verify session')
+    console.error('Error during encryption:', error);
+    return null;
   }
 }
 
- 
+// Function to decrypt the session and verify the JWT token
+export async function decrypt(session: string | undefined = ''): Promise<JWTPayload | null> {
+  if (!session) return null;
+
+  try {
+    const { payload } = await jwtVerify(session, encodedKey, { algorithms: ['HS256'] });
+    return payload;
+  } catch (error) {
+    console.warn('Failed to verify session:', error);
+    return null;
+  }
+}
+
+// Function to create a new session with a user ID and set the cookie
 export async function createSession(userId: string) {
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    const session = await encrypt({ userId, expiresAt })
-    const cookieStore = await cookies()
-   
-    cookieStore.set('session', session, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      expires: expiresAt,
-      sameSite: 'strict',
-      path: '/',
-    })
+  const expiresAt = getExpirationDate();
+  const secure = await isSecureRequest();
+  const session = await encrypt({ userId, expiresAt });
+
+  if (!session) return; // Prevent setting a broken session
+
+  const cookieStore = await cookies();
+  cookieStore.set('session', session, {
+    httpOnly: true,
+    secure,
+    expires: expiresAt,
+    sameSite: 'strict',
+    path: '/',
+  });
+}
+
+// Function to update an existing session by refreshing its expiration date
+export async function updateSession() {
+  const expiresAt = getExpirationDate();
+  const secure = await isSecureRequest();
+  const session = (await cookies()).get('session')?.value;
+  const payload = await decrypt(session);
+
+  if (!session || !payload) {
+    return null; // Return early if session or payload is invalid
   }
 
+  const cookieStore = await cookies();
+  cookieStore.set('session', session, {
+    httpOnly: true,
+    secure,
+    expires: expiresAt,
+    sameSite: 'strict',
+    path: '/',
+  });
+}
 
-   
-  export async function updateSession() {
-    const session = (await cookies()).get('session')?.value
-    const payload = await decrypt(session)
-   
-    if (!session || !payload) {
-      return null
-    }
-   
-    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-   
-    const cookieStore = await cookies()
-    cookieStore.set('session', session, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      expires: expires,
-      sameSite: 'strict',
-      path: '/',
-    })
-  }
-
-
-
+// Function to delete the session cookie
 export async function deleteSession() {
-    const cookieStore = await cookies()
-    cookieStore.delete('session')
+  const cookieStore = await cookies();
+  cookieStore.delete('session');
 }
 
-
-
+// Function to authenticate the user via email and password
 export const authenticate = async (email: string, password: string): Promise<AuthResponse> => {
-    try {
-        const response = await fetch(`${strapi.baseURL}/auth/local`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json'},
-            body: JSON.stringify({identifier: email, password: password})
-        })
+  if (!strapi.baseURL) return { error: 'API base URL is not configured' };
 
-        const result = await response.json()
+  try {
+    const response = await fetch(`${strapi.baseURL}/auth/local`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier: email, password }),
+    });
 
-        if(response.status !== 200 || result.error) {
-          return { error: result?.error.message }
-        }
+    const result = await response.json();
+    return response.ok
+      ? result
+      : { error: result?.error?.message || 'Authentication failed' };
+  } catch (error) {
+    return { error: error instanceof Error ? error.message : 'Unknown error occurred' };
+  }
+};
 
-        return result;
-
-    } catch (error) {
-        return { error: error instanceof Error ? error.message : "Unknown error occurred" };
-    }
+// Function to check if the response from authentication contains an error
+export function isAuthError(response: AuthResponse): response is { error: string } {
+  return 'error' in response;
 }
 
-export function isAuthError(response: AuthResponse): response is { error: string} {
-    return (response as { error: string}).error !== undefined;
-}
-
-
-type AuthResponse = 
+// Type definition for authentication response
+type AuthResponse =
   | {
       jwt: string;
       user: {
@@ -114,4 +132,3 @@ type AuthResponse =
       };
     }
   | { error: string };
-
