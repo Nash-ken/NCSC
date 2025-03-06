@@ -15,10 +15,10 @@ export async function login(formState: any, formData: FormData) {
   const auth = await authenticate(email, password);
   if(isAuthError(auth)) return {error: auth.error}
   
-  const { jwt } = auth;
+  const { jwt, user } = auth;
 
   await createSession(jwt)
-  return { success: true }
+  return { success: true, user }
 }
 
 //////////////////////////////////////////////////////////////////////////////////

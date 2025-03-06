@@ -9,15 +9,18 @@ import Form from 'next/form'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import React, { useActionState } from 'react'
+import { toast } from 'sonner'
 
 const LoginForm = () => {
 
     const [state, action, pending] = useActionState(async (previous: any, formData: FormData) => {
-       const user = await login(previous, formData);
-       if(user.error) {
-        console.log(user.error)
+       const auth = await login(previous, formData);
+       if(auth.error) {
+        toast.error(auth.error)
+
        }
-       if(user.success) {
+       if(auth.success) {
+        toast.success(`Welcome ${auth.user.username}!`)
         redirect('/dashboard')
        }
        
