@@ -43,7 +43,7 @@ export const getUser = cache(async () => {
 
   //////////////////////////////////////////////////////////////
 
-  type User = {
+  export type User = {
     id: number;
     documentId: string;
     username: string;
