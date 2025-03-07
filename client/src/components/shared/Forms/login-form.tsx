@@ -1,6 +1,7 @@
 "use client"
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
+import { Checkbox } from '@/components/ui/checkbox'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { login } from '@/lib/auth'
@@ -15,8 +16,11 @@ const LoginForm = () => {
 
     const [state, action, pending] = useActionState(async (previous: any, formData: FormData) => {
        const auth = await login(previous, formData);
-       if(auth.error) {
-        toast.error(auth.error)
+       if(auth.errors) {
+        auth.errors.map((error) => {
+          toast.error(error)
+        })
+       
 
        }
        if(auth.success) {
@@ -36,8 +40,22 @@ const LoginForm = () => {
         <CardDescription>Enter your email and password</CardDescription>
       </CardHeader>
       <CardContent className='flex flex-col gap-3'>
-        <Input type='email' name='email' placeholder='Email' />
+        <Input name='email' placeholder='Email' />
         <Input type='password' name='password' placeholder='Password' />
+
+        <div className="flex items-center justify-between w-full">
+          <div className="flex items-center gap-2">
+              <Checkbox id="stay-logged-in" name="stay-logged-in" />
+              <Label htmlFor="stay-logged-in" className="text-sm">Stay logged in</Label>
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="mt-2 text-right">
+              <Link href="/reset" className="text-sm text-primary underline">Forgot Password?</Link>
+            </div>
+        </div>
+
+       
       </CardContent>
       <CardFooter className="flex flex-col">
          {/* Submit Button */}
@@ -57,7 +75,7 @@ const LoginForm = () => {
     {/* Sign Up Link */}
     <div className="flex items-center text-muted-foreground text-center justify-center gap-1 mt-4">
       <p className="text-sm">Don't have an account?</p>
-      <Link href="/register" className="underline text-foreground">Sign Up</Link>
+      <Link href="/register" className="underline text-foreground text-sm">Sign Up</Link>
     </div>
       </CardFooter>
     </Card>

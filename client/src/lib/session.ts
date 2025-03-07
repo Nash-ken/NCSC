@@ -91,7 +91,7 @@ export async function deleteSession() {
 
 // Function to authenticate the user via email and password
 export const authenticate = async (email: string, password: string): Promise<AuthResponse> => {
-  if (!strapi.baseURL) return { error: 'API base URL is not configured' };
+  if (!strapi.baseURL) return { errors: ['API base URL is not configured'] };
 
   try {
     const response = await fetch(`${strapi.baseURL}/custom/login`, {
@@ -103,18 +103,23 @@ export const authenticate = async (email: string, password: string): Promise<Aut
     const result = await response.json();
     return response.ok
       ? result
-      : { error: result?.error?.message || 'Authentication failed' };
+      : { errors: [result?.error?.message || 'Authentication failed'] };
   } catch (error) {
-    return { error: error instanceof Error ? error.message : 'Unknown error occurred' };
+    return { errors: [error instanceof Error ? error.message : 'Unknown error occurred'] };
   }
 };
 
-// Function to check if the response from authentication contains an error
-export function isAuthError(response: AuthResponse): response is { error: string } {
-  return 'error' in response;
+
+// Function to check if the response from authentication contains errors
+export function isAuthError(response: AuthResponse): response is { errors: string[] } {
+  // Ensure that the response is of the correct type by checking for the 'errors' property
+  return (response as { errors: string[] }).errors !== undefined;
 }
 
+
+
 // Type definition for authentication response
+// Type definition for authentication response with array of errors
 type AuthResponse =
   | {
       jwt: string;
@@ -131,4 +136,4 @@ type AuthResponse =
         publishedAt: string;
       };
     }
-  | { error: string };
+  | { errors: string[] };  // Changed from error: string to errors: string[]
