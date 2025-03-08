@@ -55,3 +55,57 @@ export const getUser = cache(async () => {
     updatedAt: string;
     publishedAt: string;
   }
+
+  /////////////////////////////////////////////////////////////
+
+
+  export type Page = {
+    title: string;
+    slug: string;
+  }
+
+
+  export const fetchPages = async (): Promise<Page[]> => {
+    try {
+      const response = await fetch(`${strapi.baseURL}/pages/fetch-all`);
+  
+      // If the response is not successful (status code other than 2xx), handle it
+      if (!response.ok) {
+        console.error("Failed to fetch pages:", response.statusText);
+        return [];
+      }
+  
+      const result: Page[] | null = await response.json();
+  
+      // If result is null or undefined, return an empty array
+      if (!result) {
+        return [];
+      }
+  
+      return result;
+    } catch (error) {
+      // Log the error and return an empty array in case of any failure
+      console.error("Error fetching pages:", error);
+      return [];
+    }
+};
+
+export const fetchPage = async (slug: string) => {
+  try {
+    const response = await fetch(`${strapi.baseURL}/pages/${slug}`)
+
+    if(!response.ok) {
+      return null;
+    }
+
+    const result = await response.json();
+
+    if(!result) return null
+
+    return result as Page
+  } catch (error) {
+    console.error("Error fetching pages:", error);
+    return null
+  }
+}
+  

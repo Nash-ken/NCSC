@@ -1,28 +1,34 @@
-/**
- * page controller
- */
+import { factories } from "@strapi/strapi";
+import { Context } from "koa";
 
-import { factories } from '@strapi/strapi'
+export default factories.createCoreController("api::page.page", ({ strapi }) => ({
+  async findBySlug(ctx: Context) {
+    const { slug } = ctx.params;
 
-export default factories.createCoreController('api::page.page');
+    const page = await strapi.db.query("api::page.page").findOne({
+      where: { slug },
+    });
 
-
-module.exports = {
-    async findBySlug(ctx) {
-      // Get the slug from the request parameters
-      const { slug } = ctx.params;
-  
-      // Query the database to find the page by slug
-      const page = await strapi.db.query('api::page.page').findOne({
-        where: { slug }, // Look for the page with the given slug
-      });
-  
-      // If the page is not found, return a 404 error
-      if (!page) {
-        return ctx.throw(404, 'Page not found');
-      }
-  
-      // Return the page data
-      return page;
+    if (!page) {
+      return ctx.throw(404, "Page not found");
     }
-  };
+
+    return page;
+  },
+
+  async fetchAll(ctx: Context) {
+    // Query all pages, selecting only 'title' and 'slug'
+    const pages = await strapi.db.query("api::page.page").findMany({
+      select: ["title", "slug"], // Select only title and slug
+    });
+
+    // Remove duplicates based on the 'slug'
+    const uniquePages = pages.filter((value, index, self) => 
+      index === self.findIndex((t) => (
+        t.slug === value.slug
+      ))
+    );
+
+    return uniquePages;
+  },
+}));
