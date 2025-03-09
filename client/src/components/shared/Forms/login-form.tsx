@@ -36,11 +36,11 @@ const LoginForm = () => {
     <Form action={action}>
        <Card className="w-[350px] border-background md:border-border">
       <CardHeader>
-        <CardTitle>Login to your account</CardTitle>
-        <CardDescription>Enter your email and password</CardDescription>
+        <CardTitle className='text-2xl font-semibold tracking-tight text-center'>Login to your account</CardTitle>
+        <CardDescription className='text-center'>Enter your email and password</CardDescription>
       </CardHeader>
       <CardContent className='flex flex-col gap-3'>
-        <Input name='email' placeholder='Email' />
+        <Input name='email' placeholder='name@example.com' />
         <Input type='password' name='password' placeholder='Password' />
 
         <div className="flex items-center justify-between w-full">
@@ -69,8 +69,6 @@ const LoginForm = () => {
       )}
     </Button>
   
-    {/* Separator */}
-    <div className="border-b border-border h-0.5 w-full mt-8 bg-border"></div>
   
     {/* Sign Up Link */}
     <div className="flex items-center text-muted-foreground text-center justify-center gap-1 mt-4">

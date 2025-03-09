@@ -7,9 +7,6 @@ const Page = async ({params}: {params: Promise<{slug: string}>}) => {
 
   const page = await fetchPage(slug)
 
-  if(!page) {
-    notFound();
-  }
 
   return (
     <p>{page.title}</p>

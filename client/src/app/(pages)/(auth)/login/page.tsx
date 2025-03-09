@@ -4,7 +4,6 @@ const LoginPage = async () => {
   return (
     <div className='flex-1 grid place-items-center'>
        <LoginForm />
-        
     </div>
   )
 }
