@@ -10,6 +10,7 @@ import Form from 'next/form';
 import Link from 'next/link';
 import { register } from '@/lib/auth';
 import { toast } from 'sonner';
+import { redirect } from 'next/navigation';
 
 // Password strength calculator
 const calculatePasswordStrength = (password: string): { score: number; strength: string } => {
@@ -52,10 +53,14 @@ const RegisterForm = () => {
   const [state, action, pendingSubmit] = useActionState(async (previous: any, formData: FormData) => {
     const newUser = await register(previous, formData);
     if (newUser.errors) {
-      console.error(newUser.errors);
+      newUser.errors.map((error) => (
+        toast.error(error)
+      ))
+      
       return;
     }
-    console.log(newUser.success);
+    toast.success("User Created!")
+    redirect("/login")
   }, undefined);
 
   return (
