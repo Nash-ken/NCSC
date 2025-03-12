@@ -7,7 +7,7 @@ const Links = ({pages}: {pages: Page[]}) => {
   return (
     <ul className='flex items-center gap-6'>
         {pages.map((page, index) => (
-            <Link key={index} href={`/${page.slug}`}>{page.title}</Link>
+            <Link className='text-sm text-muted-foreground' key={index} href={`/${page.slug}`}>{page.title}</Link>
         ))}
     </ul>
   )

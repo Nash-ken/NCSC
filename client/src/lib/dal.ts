@@ -26,14 +26,13 @@ export const getUser = cache(async () => {
     const session = await verifySession();
     if (!session.isAuth) return null;
 
-    const decoded = (await decrypt(`${session.userId}`)) as { id: number; iat: number; exp: number };
-    if (!decoded) return null;
-
-    const response = await fetch(`${strapi.baseURL}/users/${decoded.id}`, {
-      headers: { Authorization: `Bearer ${strapi.auth}` },
+    const response = await fetch(`${strapi.baseURL}/users/me?populate[role][fields]=name&populate[role][fields]=type`, {
+      method: 'GET',
+      headers: { Authorization: `Bearer ${session.userId}` },
     });
 
     if (!response.ok) return null;
+   
     return (await response.json()) as User;
   } catch (error) {
     console.error("Error fetching user:", error);
@@ -52,6 +51,7 @@ export type User = {
   createdAt: string;
   updatedAt: string;
   publishedAt: string;
+  role: { documentId: string; id: number; name: string; type: string }
 };
 
 export type Page = {
@@ -79,4 +79,43 @@ export const fetchPage = async (slug: string): Promise<Page | never> => {
     console.error("Error fetching page:", error);
     notFound();
   }
+};
+
+//////////////////////////////////////////////////////////////
+
+export const fetchFiles = async () => {
+  try {
+    const session = await verifySession();
+    const response = await fetch(`${strapi.baseURL}/upload/files`, {
+      headers: { Authorization: `Bearer ${session.userId}` },
+    });
+
+    if (!response.ok) return [];
+
+    const files = await response.json();
+    
+    // Map API response to FileData structure
+    return files.map((file: any) => ({
+      id: file.id.toString(),
+      name: file.name,
+      size: file.size * 1024, // Convert KB to bytes
+      ext: file.ext.replace(".", ""), // Remove the dot from extension
+      createdAt: file.createdAt, // Use createdAt as upload date
+      url: process.env.NEXT_PUBLIC_API_URL + file.url
+    }));
+  } catch (error) {
+    console.error("Error fetching files:", error);
+    return [];
+  }
+};
+
+
+export type MediaFile = {
+  id: number;
+  createdAt: string;
+  publishedAt: string;
+  ext: string;
+  name: string;
+  size: number;
+  url: string;
 };

@@ -13,7 +13,7 @@ const Header = async () => {
       <div>Logo</div>
       <nav className="flex items-center gap-6">
         <Links pages={pages} />
-        {user ? (
+        {user?.role ? (
           <User user={user} pages={pages} />
         ) : (
           <Button variant={"ghost"} asChild>
