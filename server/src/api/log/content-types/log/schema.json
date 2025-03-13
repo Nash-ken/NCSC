@@ -1,0 +1,39 @@
+{
+  "kind": "collectionType",
+  "collectionName": "logs",
+  "info": {
+    "singularName": "log",
+    "pluralName": "logs",
+    "displayName": "Log",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "type": {
+      "type": "string"
+    },
+    "result": {
+      "type": "string"
+    },
+    "identifier": {
+      "type": "string"
+    },
+    "date": {
+      "type": "datetime"
+    },
+    "ipv4": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "agent": {
+      "type": "string"
+    },
+    "role": {
+      "type": "string"
+    }
+  }
+}
