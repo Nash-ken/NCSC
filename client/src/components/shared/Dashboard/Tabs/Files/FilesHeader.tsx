@@ -5,6 +5,7 @@ import { CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { uploadFileToStrapi } from "@/lib/actions"; // Import the function
+import { Loader2 } from "lucide-react";
 
 const FilesHeader: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
@@ -36,7 +37,7 @@ const FilesHeader: React.FC = () => {
         disabled={pending}
       />
       <Button variant="secondary" onClick={() => startTransition(action)} disabled={pending || !selectedFile}>
-        {pending ? "Uploading..." : "Upload"}
+        {pending ? <Loader2 className=" animate-spin" /> : "Upload"}
       </Button>
     </>
   );

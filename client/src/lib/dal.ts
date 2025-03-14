@@ -119,3 +119,15 @@ export type MediaFile = {
   size: number;
   url: string;
 };
+
+
+export type LogEntry = {
+  type: string;
+  result: string;
+  identifier: string;
+  date: Date;
+  ipv4: string;
+  reason: string | null;
+  agent: string | null;
+  role: string;
+}

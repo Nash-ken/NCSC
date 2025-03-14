@@ -53,4 +53,18 @@ export const uploadFileToStrapi = async (file: File): Promise<any> => {
       return null
     }
   };
+
+  ///////////////////////////////////////////////////////////////////////////
+
+  export const fetchLogs = async () => {
+    try {
+      const response = await fetch(`${strapi.baseURL}/logs`);
+      if(!response.ok) return null;
+
+      const { data } = await response.json();
+      return data;
+    } catch (error) {
+      return null;
+    }
+  }
   
