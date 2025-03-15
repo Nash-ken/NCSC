@@ -1,4 +1,6 @@
+import Featured from '@/components/shared/Blocks/Featured';
 import Hero from '@/components/shared/Blocks/Hero';
+import List from '@/components/shared/Blocks/List';
 import { Block, fetchPage } from '@/lib/dal';
 import React from 'react'
 
@@ -28,7 +30,10 @@ export const RenderBlock = (block: Block<any>) => {
     
     // Add more cases for other block types
     case 'blocks.featured':
-      return <>Featured</>
+      return <Featured {...block} />
+
+    case 'blocks.list':
+      return <List {...block} />
     
     // Handle unknown or unsupported block types (optional)
     default:

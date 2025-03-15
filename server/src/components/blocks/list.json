@@ -1,0 +1,15 @@
+{
+  "collectionName": "components_blocks_lists",
+  "info": {
+    "displayName": "List"
+  },
+  "options": {},
+  "attributes": {
+    "cards": {
+      "displayName": "Card",
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.card"
+    }
+  }
+}

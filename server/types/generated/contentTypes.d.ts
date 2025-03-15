@@ -445,7 +445,9 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
-    blocks: Schema.Attribute.DynamicZone<['blocks.hero', 'blocks.featured']>;
+    blocks: Schema.Attribute.DynamicZone<
+      ['blocks.hero', 'blocks.featured', 'blocks.list']
+    >;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;

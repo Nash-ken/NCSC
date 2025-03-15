@@ -74,6 +74,16 @@ export type HeroType = {
   buttons: Button[];
 }
 
+export type FeaturedType = {
+  heading: string;
+  description: string;
+  subheading: string;
+}
+
+export type ListType = {
+  cards: { title: string; description: string }[];
+}
+
 /////////////////////////////////////////////////////////////////////////
 
 type Button = {
@@ -92,9 +102,17 @@ type Navigation = {
   updatedAt: string; // or Date if you parse it into a Date object
   publishedAt: string | null;
   locale: string | null;
-  logo: string | null;
+  logo: MediaImage;
   pages: Page[];
   buttons: Button[];
+};
+
+type MediaImage = {
+  name: string;
+  alternativeText: string;
+  width: number;
+  height: number;
+  url: string;
 };
 
 export const fetchNavigation = async (): Promise<Navigation> => {
@@ -128,7 +146,13 @@ export const fetchNavigation = async (): Promise<Navigation> => {
       updatedAt: '',
       publishedAt: null,
       locale: null,
-      logo: null,
+      logo: {
+        name: "",
+        alternativeText: "",
+        width: 0,
+        height: 0,
+        url: ""
+      },
       pages: [],
       buttons: [],
     };

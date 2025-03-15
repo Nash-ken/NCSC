@@ -23,7 +23,8 @@
       "type": "dynamiczone",
       "components": [
         "blocks.hero",
-        "blocks.featured"
+        "blocks.featured",
+        "blocks.list"
       ]
     }
   }

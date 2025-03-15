@@ -10,6 +10,11 @@ const blocks = {
   },
   "blocks.featured": {
             
+  },
+  "blocks.list": {
+    populate: {
+      cards: true
+    }
   }
 }
 
