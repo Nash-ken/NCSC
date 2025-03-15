@@ -1,12 +1,31 @@
 import { factories } from "@strapi/strapi";
 import { Context } from "koa";
 
+const blocks = {
+  "blocks.hero": {
+    populate: {
+    buttons: true,
+    image: true
+    }
+  },
+  "blocks.featured": {
+            
+  }
+}
+
 export default factories.createCoreController("api::page.page", ({ strapi }) => ({
   async findBySlug(ctx: Context) {
     const { slug } = ctx.params;
 
+    const populateConfig = {
+      blocks: {
+        on: blocks,
+      }
+    }
+
     const page = await strapi.db.query("api::page.page").findOne({
       where: { slug },
+      populate: populateConfig
     });
 
     if (!page) {

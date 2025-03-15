@@ -54,21 +54,87 @@ export type User = {
   role: { documentId: string; id: number; name: string; type: string }
 };
 
+/////////////////////////////////////////////////////////////////////////
+
 export type Page = {
   title: string;
   slug: string;
+  blocks: []
 };
 
-export const fetchPages = async (): Promise<Page[]> => {
+export type Block<T> = {
+  __component: string;
+  id: number;
+} & T;
+
+export type HeroType = {
+  header: string;
+  description: string;
+  image: unknown;
+  buttons: Button[];
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+type Button = {
+  id: number;
+  label: string;
+  href: string;
+  isExternal: boolean;
+  variant: "link" | "default" | "destructive" | "outline" | "secondary" | "ghost" | null | undefined;
+  size: "default" | "sm" | "lg" | "icon" | null | undefined;
+}
+
+type Navigation = {
+  id: number;
+  documentId: string;
+  createdAt: string; // or Date if you parse it into a Date object
+  updatedAt: string; // or Date if you parse it into a Date object
+  publishedAt: string | null;
+  locale: string | null;
+  logo: string | null;
+  pages: Page[];
+  buttons: Button[];
+};
+
+export const fetchNavigation = async (): Promise<Navigation> => {
   try {
-    const response = await fetch(`${strapi.baseURL}/pages/fetch-all`);
+    const response = await fetch(`${strapi.baseURL}/navigation`);
     if (!response.ok) throw new Error(response.statusText);
-    return (await response.json()) || [];
+    
+    // Parse the response and return it as a Navigation object
+    const data: Navigation = await response.json();
+
+    // Ensure the structure is consistent (fallback for missing fields)
+    return data ?? {
+      id: 0,
+      documentId: '',
+      createdAt: '',
+      updatedAt: '',
+      publishedAt: null,
+      locale: null,
+      logo: null,
+      pages: [],
+      buttons: [],
+    };
   } catch (error) {
-    console.error("Error fetching pages:", error);
-    return [];
+    console.error("Error fetching navigation:", error);
+    
+    // Return a default empty Navigation object with pages as an empty array
+    return {
+      id: 0,
+      documentId: '',
+      createdAt: '',
+      updatedAt: '',
+      publishedAt: null,
+      locale: null,
+      logo: null,
+      pages: [],
+      buttons: [],
+    };
   }
 };
+
 
 export const fetchPage = async (slug: string): Promise<Page | never> => {
   try {

@@ -5,7 +5,7 @@ import React from 'react'
 
 const Links = ({pages}: {pages: Page[]}) => {
   return (
-    <ul className='flex items-center gap-6'>
+    <ul className='flex items-center ml-auto gap-6'>
         {pages.map((page, index) => (
             <Link className='text-sm text-muted-foreground' key={index} href={`/${page.slug}`}>{page.title}</Link>
         ))}

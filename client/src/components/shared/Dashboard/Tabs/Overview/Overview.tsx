@@ -1,3 +1,4 @@
+"use client"
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
 import { User } from "@/lib/dal";
 import { CharityChart } from "@/components/shared/Dashboard/Charts/LineChart";

@@ -402,9 +402,41 @@ export interface ApiLogLog extends Struct.CollectionTypeSchema {
   };
 }
 
+export interface ApiNavigationNavigation extends Struct.SingleTypeSchema {
+  collectionName: 'navigations';
+  info: {
+    description: '';
+    displayName: 'Navigation';
+    pluralName: 'navigations';
+    singularName: 'navigation';
+  };
+  options: {
+    draftAndPublish: true;
+  };
+  attributes: {
+    buttons: Schema.Attribute.Component<'elements.button', true>;
+    createdAt: Schema.Attribute.DateTime;
+    createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+    locale: Schema.Attribute.String & Schema.Attribute.Private;
+    localizations: Schema.Attribute.Relation<
+      'oneToMany',
+      'api::navigation.navigation'
+    > &
+      Schema.Attribute.Private;
+    logo: Schema.Attribute.Media<'images' | 'files' | 'videos' | 'audios'>;
+    pages: Schema.Attribute.Relation<'oneToMany', 'api::page.page'>;
+    publishedAt: Schema.Attribute.DateTime;
+    updatedAt: Schema.Attribute.DateTime;
+    updatedBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
+      Schema.Attribute.Private;
+  };
+}
+
 export interface ApiPagePage extends Struct.CollectionTypeSchema {
   collectionName: 'pages';
   info: {
+    description: '';
     displayName: 'Page';
     pluralName: 'pages';
     singularName: 'page';
@@ -413,6 +445,7 @@ export interface ApiPagePage extends Struct.CollectionTypeSchema {
     draftAndPublish: true;
   };
   attributes: {
+    blocks: Schema.Attribute.DynamicZone<['blocks.hero', 'blocks.featured']>;
     createdAt: Schema.Attribute.DateTime;
     createdBy: Schema.Attribute.Relation<'oneToOne', 'admin::user'> &
       Schema.Attribute.Private;
@@ -938,6 +971,7 @@ declare module '@strapi/strapi' {
       'admin::transfer-token-permission': AdminTransferTokenPermission;
       'admin::user': AdminUser;
       'api::log.log': ApiLogLog;
+      'api::navigation.navigation': ApiNavigationNavigation;
       'api::page.page': ApiPagePage;
       'plugin::content-releases.release': PluginContentReleasesRelease;
       'plugin::content-releases.release-action': PluginContentReleasesReleaseAction;

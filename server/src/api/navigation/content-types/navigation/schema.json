@@ -1,0 +1,36 @@
+{
+  "kind": "singleType",
+  "collectionName": "navigations",
+  "info": {
+    "singularName": "navigation",
+    "pluralName": "navigations",
+    "displayName": "Navigation",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": true
+  },
+  "attributes": {
+    "logo": {
+      "type": "media",
+      "multiple": false,
+      "required": false,
+      "allowedTypes": [
+        "images",
+        "files",
+        "videos",
+        "audios"
+      ]
+    },
+    "buttons": {
+      "type": "component",
+      "repeatable": true,
+      "component": "elements.button"
+    },
+    "pages": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::page.page"
+    }
+  }
+}

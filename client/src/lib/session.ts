@@ -94,7 +94,7 @@ export const authenticate = async (email: string, password: string): Promise<Aut
   if (!strapi.baseURL) return { errors: ['API base URL is not configured'] };
 
   try {
-    const response = await fetch(`${strapi.baseURL}/custom/login`, {
+    const response = await fetch(`${strapi.baseURL}/account/login`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier: email, password }),
