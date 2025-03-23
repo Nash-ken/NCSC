@@ -20,21 +20,21 @@ git clone https://github.com/Nash-ken/NCSC.git
 cd NCSC
 ```
 
-###Backend
+### 2. Backend
 ```bash
 cd server
 pnpm install
 pnpm develop
 ```
 
-###Frontend
+### 3. Frontend
 ```bash
 cd client
 pnpm install
 pnpm dev
 ```
 
-###Environment Variables Setup
+### 4. Environment Variables Setup
 After starting Strapi for the first time, locate the JWT secret from the .env file inside the server folder.
 
 Copy This Line
@@ -45,7 +45,7 @@ JWT_SECRET=your-strapi-jwt-secret
 Paste JWT Secret in Client
 Open the .env.local file in the client folder and paste the same JWT secret.
 
-####Generate Full Access API Token
+#### Generate Full Access API Token
 
 Go to Strapi admin panel.
 
@@ -59,7 +59,7 @@ Add API Token to Client
 In the client’s .env.local file:
 STRAPI_API_TOKEN=your-full-access-api-token
 
-###Additional Notes
+### Additional Notes
 Ensure both server and client .env files are properly configured for smooth authentication and API access.
 
 Make sure ports 1337 (Strapi) and 3000 (Next.js) are not blocked or used by other services.
