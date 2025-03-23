@@ -1,0 +1,14 @@
+{
+  "collectionName": "components_layout_news",
+  "info": {
+    "displayName": "News"
+  },
+  "options": {},
+  "attributes": {
+    "news": {
+      "type": "relation",
+      "relation": "oneToMany",
+      "target": "api::news.news"
+    }
+  }
+}

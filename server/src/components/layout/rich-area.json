@@ -1,0 +1,13 @@
+{
+  "collectionName": "components_layout_rich_areas",
+  "info": {
+    "displayName": "Rich Area",
+    "description": ""
+  },
+  "options": {},
+  "attributes": {
+    "Content": {
+      "type": "blocks"
+    }
+  }
+}

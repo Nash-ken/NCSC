@@ -1,0 +1,41 @@
+{
+  "kind": "collectionType",
+  "collectionName": "logs",
+  "info": {
+    "singularName": "log",
+    "pluralName": "logs",
+    "displayName": "Log",
+    "description": ""
+  },
+  "options": {
+    "draftAndPublish": false
+  },
+  "attributes": {
+    "Type": {
+      "type": "enumeration",
+      "enum": [
+        "Authentication",
+        "File"
+      ]
+    },
+    "User": {
+      "type": "string"
+    },
+    "State": {
+      "type": "enumeration",
+      "enum": [
+        "Success",
+        "Failure"
+      ]
+    },
+    "Activity": {
+      "type": "text"
+    },
+    "Source": {
+      "type": "string"
+    },
+    "Browser": {
+      "type": "string"
+    }
+  }
+}
