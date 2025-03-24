@@ -9,7 +9,7 @@ export default {
             path: '/pages/all',
             handler: 'page.find',
             config: {
-                auth: false
+              auth: false,
             }
         },
         {

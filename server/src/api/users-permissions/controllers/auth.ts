@@ -170,9 +170,17 @@ export default factories.createCoreController('plugin::users-permissions.user', 
               resetPasswordToken: resetToken, // Store the JWT token in the user record
             },
           });
+
+          let baseUrl = process.env.DOMAIN_URL;
+
+          // If DOMAIN_URL is not set or is empty, use localhost:3000
+          if (!baseUrl) {
+            baseUrl = process.env.NODE_ENV === 'production' ? 'http://localhost:3000' : 'http://localhost:3000';
+          }
+    
       
           // Construct the reset URL for the frontend
-          const resetUrl = `${process.env.NEXT_URL}/reset/password?token=${resetToken}`;
+          const resetUrl = `${baseUrl}/reset/password?token=${resetToken}`;
           
           // Send the reset link via email using Resend
           try {

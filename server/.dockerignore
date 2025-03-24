@@ -1,0 +1,14 @@
+node_modules
+*.log
+.dockerignore
+Dockerfile
+.git
+.gitignore
+.env
+.idea
+*.md
+tmp
+.tmp
+build
+*.test.js
+.strapi

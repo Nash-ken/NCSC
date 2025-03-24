@@ -4,15 +4,13 @@ import { notFound } from 'next/navigation';
 import React from 'react';
 import { Metadata } from 'next';
 
-type PageParams = {
-  params: { slug: string };
-};
+
+
 
 // --- DYNAMIC METADATA ---
-export async function generateMetadata({ params }: PageParams): Promise<Metadata> {
-  const { slug } = await params;
+export async function generateMetadata({params}: { params: Promise<{ slug: string }>}): Promise<Metadata> {
+  const { slug } = await params; // No need to await params, just access directly
   const page = await fetchPage(slug);
-
 
   if (!page) {
     return {
@@ -21,17 +19,17 @@ export async function generateMetadata({ params }: PageParams): Promise<Metadata
   }
 
   return {
-    title: `NCSC | ${page.title}` || 'Untitled Page',
+    title: `NCSC | ${page.title || 'Untitled Page'}`, // Fallback title in case page.title is undefined
   };
 }
 
 // --- PAGE RENDER ---
-const DynamicPage = async ({ params }: PageParams) => {
-  const { slug } = await params;
+const DynamicPage = async ({params}: { params: Promise<{ slug: string }>}) => {
+  const { slug } = await params; // No need to await params here either
   const page = await fetchPage(slug);
 
   if (!page) {
-    notFound();
+    notFound(); // Navigate to the "not found" page if no page data is found
   }
 
   const blocks = page.blocks;

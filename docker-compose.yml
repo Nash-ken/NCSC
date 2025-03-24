@@ -1,0 +1,61 @@
+version: "3.8"
+
+services:
+  nextjs:
+    image: your-dockerhub-username/nextjs-app:latest
+    container_name: nextjs
+    build:
+      context: ./client
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_STRAPI_URL=http://strapi:1337  # Updated to use strapi service name
+      - NEXT_PUBLIC_CLIENT_URL=http://nextjs:3000
+      - FULL_ACCESS_TOKEN=1e53e8c1f12d0b47c5079d5101ad9db82318ce2fd512346beb9c5b57d7e58418245edc7aba507cc3963ee9f0da00068349732fc72b71f8a7e10fff5f5ba97ab685e125955e0d57b34f84a2062d41d478a6fe72ff9de5507e05b9d5bd90d020b066aea8358a1572f74380df8a3df11a7229b076814c0ac4b94d8be104ab8f448c
+      - JWT_SECRET=h1f+H7igzNQb6We5iKDPBA==
+      - MAX_FILE_SIZE_MB=50
+    depends_on:
+      - strapi
+    networks:
+      - app-network
+
+  strapi:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: strapi
+    ports:
+      - "1337:1337"
+    environment:
+      - HOST=0.0.0.0
+      - PORT=1337
+      - APP_KEYS=FoMQFrSW8JCMsq876ULdMA==,8RSG5TjeSCm8/bXPninrSQ==,fhV8g4r/RIjBrjjeTa4pvw==,j3OiDWzwFkKxrSJC7P1Jyw==
+      - API_TOKEN_SALT=uwVRgQFzu47nLHBWps4CXA==
+      - ADMIN_JWT_SECRET=zW53fbxB+XaA3XkJHxCQdw==
+      - TRANSFER_TOKEN_SALT=IlEuNweK9ey1J/GJ1R2Uaw==
+      - DATABASE_CLIENT=sqlite
+      - DATABASE_HOST=
+      - DATABASE_PORT=
+      - DATABASE_NAME=
+      - DATABASE_USERNAME=
+      - DATABASE_PASSWORD=
+      - DATABASE_SSL=false
+      - DATABASE_FILENAME=.tmp/data.db
+      - JWT_SECRET=h1f+H7igzNQb6We5iKDPBA==
+      - STRAPI_URL=http://strapi:1337  # Using the Docker service name for internal communication
+      - NEXT_URL=http://nextjs:3000
+      - MAX_FILE_SIZE_MB=50
+      - RESEND_API_KEY=re_jBdT6bRm_A7HEvc1kb8XyEsy53iyR6cZJ
+      - MAX_LOGIN_ATTEMPTS=5
+      - LOCK_TIME=15
+    volumes:
+      - strapi-data:/app/data  # Ensure persistence of SQLite database
+    networks:
+      - app-network
+
+volumes:
+  strapi-data:  # Persistent volume for SQLite data
+
+networks:
+  app-network:
+    driver: bridge

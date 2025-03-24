@@ -1,20 +1,33 @@
 "use client"
-import { cn } from "@/lib/utils"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Loader2 } from "lucide-react"
-import { redirect, useSearchParams } from "next/navigation"
-import { startTransition, useActionState, useState } from "react"
-import { changePassword, logout } from "@/lib/actions/auth"
-import { toast } from "sonner"
+import { Suspense } from "react";
+import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Loader2 } from "lucide-react";
+import { useSearchParams } from "next/navigation";
+import { startTransition, useActionState } from "react";
+import { changePassword, logout } from "@/lib/actions/auth";
+import { toast } from "sonner";
 
 export function NewPasswordForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <NewPasswordFormContent className={className} {...props} />
+        </Suspense>
+    );
+}
+
+function NewPasswordFormContent({
+    className,
+    ...props
+}: React.ComponentProps<"div">) {
     const [searchParams] = useSearchParams();
     const token = searchParams[1]; // Access the 'token' query parameter
+
     // State for password and confirmation
     const [ state, action, pending ] = useActionState( async (prev: any, formData: FormData) => {
        
@@ -58,8 +71,7 @@ export function NewPasswordForm({
                                     placeholder="Confirm New Password"
                                 />
                             </div>
-                           
-                          
+
                             <Button type="submit" className="w-full flex items-center gap-1">
                                 {pending ? (
                                     <div className="flex items-center gap-1">
