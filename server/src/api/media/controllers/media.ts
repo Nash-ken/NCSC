@@ -5,7 +5,10 @@ import { Context } from 'koa';
 import path from 'path';
 import fs from 'fs'
 import { promisify } from 'util';
-const moveFile = promisify(fs.rename);
+
+
+const copyFile = promisify(fs.copyFile);
+const unlink = promisify(fs.unlink);
 
 /**
  * Controller for handling media files.
@@ -119,16 +122,13 @@ export default factories.createCoreController('plugin::upload.file', ({ strapi }
   async uploadFile(ctx) {
     const { files } = ctx.request;
     
-    
-    // Handle the case where there is a single file or an array of files
     let file;
     if (Array.isArray(files.file)) {
-      file = files.file[0]; // Use the first file if multiple files are uploaded
+      file = files.file[0];
     } else {
       file = files.file;
     }
-  
-    // Validate if the file exists
+
     if (!file) {
       return ctx.badRequest('No file uploaded');
     }
@@ -141,49 +141,47 @@ export default factories.createCoreController('plugin::upload.file', ({ strapi }
     if (file.size > maxFileSizeBytes) {
       return ctx.badRequest(`File too large. Max size is ${MAX_FILE_SIZE_MB}MB.`);
     }
-  
-    // Find or create the folder where the file will be stored
+
+    // Find the folder where the file will be stored
     const folder = await strapi.db.query('plugin::upload.folder').findOne({
-      where: { name: 'Files' }, // Adjust the folder name as needed
+      where: { name: 'Files' },
     });
-  
+
     if (!folder) {
       return ctx.badRequest('Folder not found');
     }
-  
-    // Create the path where the file will be stored in public/uploads
+
+    // Define the uploads path
     const uploadsPath = path.join(strapi.dirs.static.public, 'uploads');
     
-    // Ensure the uploads directory exists
+    // Ensure uploads directory exists
     if (!fs.existsSync(uploadsPath)) {
       fs.mkdirSync(uploadsPath, { recursive: true });
     }
-  
-    // Generate the file path
-    const ext = path.extname(file.originalFilename); // Get the file extension
-    const name = file.originalFilename; // Use the original filename
-    const filePath = path.join(uploadsPath, name); // Full path where the file will be saved
-  
-    // Move the file to the `public/uploads` folder
-    await moveFile(file.filepath, filePath); // Use fs.rename to move the file
-  
-    // Save metadata in the database
+
+    const ext = path.extname(file.originalFilename);
+    const name = file.originalFilename;
+    const filePath = path.join(uploadsPath, name);
+
+    // Copy the file and delete the original to avoid EXDEV error
+    await copyFile(file.filepath, filePath);
+    await unlink(file.filepath);
+
+    // Save file metadata in the database
     const uploadData = {
-      name, // Original filename
-      hash: name.split('.')[0], // File name without the extension
-      ext, // File extension (e.g., .txt, .jpg)
-      mime: file.mimetype, // MIME type (e.g., text/plain, image/jpeg)
-      size: file.size / 1000, // Size in KB (convert from bytes to kilobytes)
-      url: `/uploads/${name}`, // URL to access the file
-      folder: folder.id, // Folder ID from the database
+      name,
+      hash: name.split('.')[0],
+      ext,
+      mime: file.mimetype,
+      size: file.size / 1000,
+      url: `/uploads/${name}`,
+      folder: folder.id,
       folderPath: '/1'
     };
-  
-    // Save the file data into the database
+
     const uploadedFile = await strapi.db.query('plugin::upload.file').create({
       data: uploadData,
     });
-    
 
     await strapi.service('api::log.log').createLog({
       Type: 'File',
@@ -193,8 +191,7 @@ export default factories.createCoreController('plugin::upload.file', ({ strapi }
       Source: ctx.request.ip,
       Browser: ctx.request.headers['user-agent']
     });
-  
-    // Return the uploaded file details as a response
+
     ctx.send(uploadedFile);
   }
 }));

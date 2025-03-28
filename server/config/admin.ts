@@ -1,4 +1,6 @@
 export default ({ env }) => ({
+  serveAdminPanel: true,
+  url: '/admin',
   auth: {
     secret: env('ADMIN_JWT_SECRET'),
   },
